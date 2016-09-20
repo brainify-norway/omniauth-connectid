@@ -6,45 +6,46 @@ require 'uri'
 module OmniAuth
   module Strategies
     class Connectid < OmniAuth::Strategies::OAuth2
-      # Give your strategy a name.
       option :name, "connectid"
-
-      # This is where you pass the options you would pass when
-      # initializing your consumer from the OAuth gem.
       option :client_options, {
         :site          => 'https://connectid.no',
         :authorize_url => '/user/oauth/authorize',
         :token_url     => '/user/oauth/token'
       }
 
-      # These are called after authentication has succeeded. If
-      # possible, you should try to set the UID without making
-      # additional calls (if the user id is returned with the token
-      # or as a URI parameter). This may not be possible with all
-      # providers.
       uid {
         raw_info['userId']
       }
 
       info do
+        if raw_info["credential"]["credentialType"] == "A"
+          email = raw_info["credential"]["credential"]
+          mobile = raw_info["phoneNumbers"]["phoneNumber"]["phoneNumber"]
+        else
+          email = Array(raw_info["emails"]["email"]).first
+          mobile = raw_info["credential"]["credential"]
+        end
+
         {
-          # :name => raw_info['name']["firstName"] + ,
-          :email => raw_info['credential']['credential']
+          :email => email,
+          :mobile => mobile
         }
       end
 
       extra do
         {
-          'raw_info' => raw_info
+          :raw_info => raw_info,
+          :raw_subscriptions_info => raw_subscription_info
         }
       end
 
       def raw_info
-        profile = access_token.get('https://api.mediaconnect.no/capi/v1/customer/profile')
-        @raw_info ||= Hash.from_xml(profile.body)["profile"]
-        @raw_info
+        @raw_info ||= Hash.from_xml(access_token.get('https://api.mediaconnect.no/capi/v1/customer/profile').body)["profile"]
       end
 
+      def raw_subscription_info
+        @raw_subscription_info ||= Hash.from_xml(access_token.get('https://api.mediaconnect.no/capi/v1/subscription').body)["subscriptions"]
+      end
     end
   end
 end
