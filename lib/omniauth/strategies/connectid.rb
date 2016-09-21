@@ -18,12 +18,14 @@ module OmniAuth
       }
 
       info do
-        if raw_info["credential"]["credentialType"] == "A"
-          email = raw_info["credential"]["credential"]
-          mobile = raw_info["phoneNumbers"]["phoneNumber"]["phoneNumber"]
+        profile = Hash.from_xml(raw_info)["profile"]
+
+        if profile["credential"]["credentialType"] == "A"
+          email = profile["credential"]["credential"]
+          mobile = profile["phoneNumbers"]["phoneNumber"]["phoneNumber"]
         else
-          email = Array(raw_info["emails"]["email"]).first
-          mobile = raw_info["credential"]["credential"]
+          email = Array(profile["emails"]["email"]).first
+          mobile = profile["credential"]["credential"]
         end
 
         {
@@ -33,18 +35,19 @@ module OmniAuth
       end
 
       extra do
+        subscriptions = Hash.from_xml(raw_subscription_info)["subscriptions"]["subscription"]
+        subscriptions = [subscriptions] if subscriptions.class == Hash
         {
-          :raw_info => raw_info,
-          :raw_subscriptions_info => raw_subscription_info
+          :subscriptions => subscriptions
         }
       end
 
       def raw_info
-        @raw_info ||= Hash.from_xml(access_token.get('https://api.mediaconnect.no/capi/v1/customer/profile').body)["profile"]
+        @raw_info ||= access_token.get('https://api.mediaconnect.no/capi/v1/customer/profile').body
       end
 
       def raw_subscription_info
-        @raw_subscription_info ||= Hash.from_xml(access_token.get('https://api.mediaconnect.no/capi/v1/subscription').body)["subscriptions"]
+        @raw_subscription_info ||= access_token.get('https://api.mediaconnect.no/capi/v1/subscription').body
       end
     end
   end
