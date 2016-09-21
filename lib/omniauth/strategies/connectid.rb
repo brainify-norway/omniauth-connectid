@@ -18,12 +18,12 @@ module OmniAuth
       }
 
       info do
-        profile = Hash.from_xml(raw_info)["profile"]
-
+        
         email = nil
         mobile = nil
 
         begin
+          profile = Hash.from_xml(raw_info)["profile"]
           if profile["credential"]["credentialType"] == "A"
             email = profile["credential"]["credential"]
             mobile = profile["phoneNumbers"]["phoneNumber"]["phoneNumber"]
@@ -41,8 +41,14 @@ module OmniAuth
       end
 
       extra do
-        subscriptions = Hash.from_xml(raw_subscription_info)["subscriptions"]["subscription"]
-        subscriptions = [subscriptions] if subscriptions.class == Hash
+        subscriptions = []
+
+        begin
+          subscriptions = Hash.from_xml(raw_subscription_info)["subscriptions"]["subscription"]
+          subscriptions = [subscriptions] if subscriptions.class == Hash
+        rescue NoMethodError => e
+        end
+
         {
           :subscriptions => subscriptions
         }
