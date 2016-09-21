@@ -23,8 +23,6 @@ module OmniAuth
         email = nil
         mobile = nil
 
-        p profile
-
         begin
           if profile["credential"]["credentialType"] == "A"
             email = profile["credential"]["credential"]
@@ -35,8 +33,6 @@ module OmniAuth
           end
         rescue NoMethodError => e
         end
-
-        p mobile, email
 
         {
           :email => email,
