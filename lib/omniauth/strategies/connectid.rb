@@ -20,13 +20,23 @@ module OmniAuth
       info do
         profile = Hash.from_xml(raw_info)["profile"]
 
-        if profile["credential"]["credentialType"] == "A"
-          email = profile["credential"]["credential"]
-          mobile = profile["phoneNumbers"]["phoneNumber"]["phoneNumber"]
-        else
-          email = Array(profile["emails"]["email"]).first
-          mobile = profile["credential"]["credential"]
+        email = nil
+        mobile = nil
+
+        p profile
+
+        begin
+          if profile["credential"]["credentialType"] == "A"
+            email = profile["credential"]["credential"]
+            mobile = profile["phoneNumbers"]["phoneNumber"]["phoneNumber"]
+          else
+            mobile = profile["credential"]["credential"]
+            email = Array(profile["emails"]["email"]).first
+          end
+        rescue NoMethodError => e
         end
+
+        p mobile, email
 
         {
           :email => email,
