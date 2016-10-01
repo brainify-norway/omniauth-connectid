@@ -18,7 +18,7 @@ module OmniAuth
       }
 
       info do
-        
+
         email = nil
         mobile = nil
 
@@ -31,6 +31,7 @@ module OmniAuth
             mobile = profile["credential"]["credential"]
             email = Array(profile["emails"]["email"]).first
           end
+        rescue TypeError => e
         rescue NoMethodError => e
         end
 
