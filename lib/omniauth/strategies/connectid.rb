@@ -33,6 +33,7 @@ module OmniAuth
           end
         rescue TypeError => e
         rescue NoMethodError => e
+        rescue => e
         end
 
         {
