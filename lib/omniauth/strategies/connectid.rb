@@ -24,22 +24,30 @@ module OmniAuth
 
         begin
           profile = Hash.from_xml(raw_info)["profile"]
+
+          p "Profile login"
+          p profile
+
           if profile["credential"]["credentialType"] == "A"
             email = profile["credential"]["credential"]
-
-            p "Profile login"
-            p profile
-
             if profile["phoneNumbers"].class == Hash
               if profile["phoneNumbers"]["phoneNumber"].class == Hash
                 if profile["phoneNumbers"]["phoneNumber"]["phoneNumber"].class == String
                   mobile = profile["phoneNumbers"]["phoneNumber"]["phoneNumber"]
                 end
+              elsif profile["phoneNumbers"]["phoneNumber"].class == String
+                mobile = profile["phoneNumbers"]["phoneNumber"]
               end
             end
           else
             mobile = profile["credential"]["credential"]
-            email = Array(profile["emails"]["email"]).first
+            if profile["emails"].class == Hash
+              if profile["emails"]["email"].class == String
+                email = profile["emails"]["email"]
+              elsif profile["emails"]["email"].class == Array
+                email = profile["emails"]["email"][0]
+              end
+            end
           end
         rescue TypeError => e
         rescue NoMethodError => e
@@ -57,8 +65,11 @@ module OmniAuth
 
         begin
           subscriptions = Hash.from_xml(raw_subscription_info)["subscriptions"]["subscription"]
-          subscriptions = [subscriptions] if subscriptions.class == Hash
         rescue NoMethodError => e
+        end
+
+        if subscriptions.class != Array
+          subscriptions = Array(subscriptions)
         end
 
         {
