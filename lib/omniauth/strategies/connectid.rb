@@ -74,6 +74,8 @@ module OmniAuth
           subscriptions = [subscriptions]
         end
 
+        p "new subscriptions", subscriptions
+
         {
           :subscriptions => subscriptions
         }
