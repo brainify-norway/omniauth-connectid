@@ -68,6 +68,8 @@ module OmniAuth
         rescue NoMethodError => e
         end
 
+        p "subscriptions", subscriptions
+
         if subscriptions.class == Hash
           subscriptions = [subscriptions]
         end
