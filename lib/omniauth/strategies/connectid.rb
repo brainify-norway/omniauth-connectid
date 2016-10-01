@@ -68,6 +68,9 @@ module OmniAuth
         rescue NoMethodError => e
         end
 
+        p "subscriptions"
+        p subscriptions
+
         if subscriptions.class != Array
           subscriptions = Array(subscriptions)
         end
