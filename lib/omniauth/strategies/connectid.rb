@@ -26,7 +26,17 @@ module OmniAuth
           profile = Hash.from_xml(raw_info)["profile"]
           if profile["credential"]["credentialType"] == "A"
             email = profile["credential"]["credential"]
-            mobile = profile["phoneNumbers"]["phoneNumber"]["phoneNumber"]
+
+            p "Profile login"
+            p profile
+
+            if profile["phoneNumbers"].class == Hash
+              if profile["phoneNumbers"]["phoneNumber"].class == Hash
+                if profile["phoneNumbers"]["phoneNumber"]["phoneNumber"].class == String
+                  mobile = profile["phoneNumbers"]["phoneNumber"]["phoneNumber"]
+                end
+              end
+            end
           else
             mobile = profile["credential"]["credential"]
             email = Array(profile["emails"]["email"]).first
