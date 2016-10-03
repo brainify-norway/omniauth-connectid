@@ -63,18 +63,13 @@ module OmniAuth
       extra do
         subscriptions = []
 
-        begin
+        if raw_subscription_info
           subscriptions = Hash.from_xml(raw_subscription_info)["subscriptions"]["subscription"]
-        rescue NoMethodError => e
+
+          if subscriptions.class == Hash
+            subscriptions = [subscriptions]
+          end
         end
-
-        p "subscriptions", subscriptions
-
-        if subscriptions.class == Hash
-          subscriptions = [subscriptions]
-        end
-
-        p "new subscriptions", subscriptions
 
         {
           :subscriptions => subscriptions
@@ -82,11 +77,17 @@ module OmniAuth
       end
 
       def raw_info
-        @raw_info ||= access_token.get('https://api.mediaconnect.no/capi/v1/customer/profile').body
+        begin
+          @raw_info ||= access_token.get('https://api.mediaconnect.no/capi/v1/customer/profile').body
+        rescue => e
+        end
       end
 
       def raw_subscription_info
-        @raw_subscription_info ||= access_token.get('https://api.mediaconnect.no/capi/v1/subscription').body
+        begin
+          @raw_subscription_info ||= access_token.get('https://api.mediaconnect.no/capi/v1/subscription').body
+        rescue => e
+        end
       end
     end
   end
