@@ -56,7 +56,11 @@ module OmniAuth
 
         {
           :email => email,
-          :mobile => mobile
+          :mobile => mobile,
+          :name => {
+            :first_name => profile["name"]["firstName"],
+            :last_name => profile["name"]["lastName"]
+          }
         }
       end
 
