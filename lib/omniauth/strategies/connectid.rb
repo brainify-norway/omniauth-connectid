@@ -25,9 +25,6 @@ module OmniAuth
         begin
           profile = Hash.from_xml(raw_info)["profile"]
 
-          p "Profile login"
-          p profile
-
           if profile["credential"]["credentialType"] == "A"
             email = profile["credential"]["credential"]
             if profile["phoneNumbers"].class == Hash
@@ -54,14 +51,25 @@ module OmniAuth
         rescue => e
         end
 
-        {
-          :email => email,
-          :mobile => mobile,
-          :name => {
+        name = {
+          :first_name => "",
+          :middle_name => "",
+          :last_name => ""
+        }
+
+        if profile["name"].present?
+          name = {
             :first_name => profile["name"]["firstName"] ? profile["name"]["firstName"] : "",
             :middle_name => profile["name"]["middleName"] ? profile["name"]["middleName"] : "",
             :last_name => profile["name"]["lastName"] ? profile["name"]["lastName"] : ""
           }
+        end
+
+
+        {
+          :email => email,
+          :mobile => mobile,
+          :name => name
         }
       end
 
