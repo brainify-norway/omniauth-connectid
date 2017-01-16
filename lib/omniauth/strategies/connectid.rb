@@ -67,8 +67,8 @@ module OmniAuth
 
 
         {
-          :email => email,
-          :mobile => mobile,
+          :email => email ? email : "",
+          :mobile => mobile ? mobile : "",
           :name => name
         }
       end
